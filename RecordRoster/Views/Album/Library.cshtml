@@ -1,0 +1,43 @@
+﻿
+@{
+    ViewBag.Title= "Album Library";
+    var albums = ViewBag.Albums as List<RecordRoster.Models.Album>;
+}
+
+<h2>Random Album</h2>
+
+<table border="1">
+    <tr>
+        <th>Cover</th>
+        <th>Title</th>
+        <th>Artist</th>
+        <th>Year</th>
+        <th>Actions</th>
+    </tr>
+    @foreach (var album in albums)
+            {
+                <tr>
+                    <td>
+                        <img src="@album.ImageUrl" alt="Album Cover" width="100" height="100">
+                    </td>
+                    <td><input type="text" class="title" value="@album.Title" data-id="@album.Id"></td>
+                    <td><input type="text" class="artist" value="@album.Artist" data-id="@album.Id"></td>
+                    <td><input type="number" class="year" value="@album.Year" data-id="@album.Id"></td>
+                    <td>
+                        <button class="saveBtn" data-id="@album.Id">Save</button>
+                        <button class="deleteBtn" data-id="@album.Id">Delete</button>
+                    </td>
+                </tr>
+            }
+</table>
+
+<h3>Add a New Album</h3>
+<input type="text" id="newTitle" placeholder="Title">
+<input type="text" id="newArtist" placeholder="Artist">
+<input type="number" id="newYear" placeholder="Year">
+<input type="text" id="newImageUrl" placeholder="Image URL">
+<button id="addAlbumBtn">Add Album</button>
+
+<a href="@Url.Action("Index", "Album")" class="btn btn-primary">Back to Random Album</a>
+
+
