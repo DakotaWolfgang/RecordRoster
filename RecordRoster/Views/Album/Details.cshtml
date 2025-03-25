@@ -1,0 +1,18 @@
+﻿@model RecordRoster.Models.Album
+
+@{
+    ViewBag.Title = Model.Title;
+}
+
+<p>
+    <a href="@Url.Action("Library", "Album")" class="btn btn-primary">&lt;- Back to Library</a>
+</p>
+
+<h2>@Model.Title</h2>
+
+<img src="@Model.Cover" alt="Album Cover" width="250" height="250" style="border-radius: 5px; margin-bottom: 10px;">
+<p><strong>Title:</strong> @Model.Title </p>
+<p><strong>Artist:</strong> @Model.Artist </p>
+<p><strong>Year:</strong> @Model.ReleaseYear </p>
+<p><strong>Tracklist:</strong></p>
+@* TODO: Tracklist on the album detail view here *@
