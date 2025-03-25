@@ -12,18 +12,39 @@ namespace RecordRoster.Controllers
     public class AlbumController : Controller
     {
         private readonly RecordRosterDb _context = new RecordRosterDb();
-        // GET: Album
-        public ActionResult Index()
+
+        // GET: Library view
+        public ActionResult Library()
         {
-            var albums = _context.Albums.ToList();
-            ViewBag.RandomAlbum = albums.OrderBy(a => Guid.NewGuid()).FirstOrDefault();
+            return View(_context.Albums.ToList());
+        }
+
+        // GET: Add album form view
+        public ActionResult Add()
+        {
             return View();
         }
 
-        public ActionResult Library()
+        // GET: Album detail view
+        public ActionResult Details()
         {
-            ViewBag.Albums = _context.Albums.ToList();
-            return View();
+            // Assume ID in route
+            var val = RouteData.Values["id"];
+            if (val == null)
+            {
+                // Broken route, send back to library
+                return RedirectToAction("Library");
+            }
+
+            int albumId = int.Parse(val.ToString());
+            Album album = _context.Albums.Find(albumId);
+            if (album == null)
+            {
+                // Album does not exist, send back to library
+                return RedirectToAction("Library");
+            }
+
+            return View(album);
         }
 
 
@@ -36,16 +57,17 @@ namespace RecordRoster.Controllers
             {
                 existingAlbum.Title = album.Title;
                 existingAlbum.Artist = album.Artist;
-                existingAlbum.Year = album.Year;
-                existingAlbum.ImageUrl = album.ImageUrl;
+                existingAlbum.ReleaseYear = album.ReleaseYear;
+                existingAlbum.Cover = album.Cover;
                 _context.SaveChanges();
-                return Json(new { message = "Album updated Successfully" });
+                return RedirectToAction("Library");
             }
-            return Json(new { message = "Album not found" });
+            return RedirectToAction("Library");
         }
 
 
-        // Delete Album Placeholder
+        // Delete Album
+        // TODO: Use TempData to send success/fail message to library page
         [HttpPost]
         public ActionResult DeleteAlbum(int id)
         {
@@ -54,19 +76,20 @@ namespace RecordRoster.Controllers
             {
                 _context.Albums.Remove(album);
                 _context.SaveChanges();
-                return Json(new { message = "Album deleted Successfully" });
+                return RedirectToAction("Library");
             }
-            return Json(new { message = "Album not found" });
+
+            return RedirectToAction("Library");
         }
 
 
-        // Add Album Placeholder
+        // Add Album
         [HttpPost]
         public ActionResult AddAlbum(Album album)
         {
             _context.Albums.Add(album);
             _context.SaveChanges();
-            return Json(new { message = "Album added Successfully" });
+            return RedirectToAction("Library");
         }
     }
 }

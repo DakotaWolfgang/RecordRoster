@@ -262,7 +262,7 @@ ServiceFabricBackup/
 *.rptproj.bak
 
 # SQL Server files
-*.mdf
+# *.mdf - We are using the SQL Server LocalDB so this is needed
 *.ldf
 *.ndf
 

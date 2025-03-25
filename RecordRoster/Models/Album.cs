@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace RecordRoster.Models
 {
 	public class Album
 	{
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
 		public int Id { get; set; }
 
 		[Required(ErrorMessage = "Title is required")]
@@ -17,9 +20,9 @@ namespace RecordRoster.Models
         public string Artist { get; set; }
 
         [Required(ErrorMessage = "Year Released is required")]
-        public string Year { get; set; }
+        public int ReleaseYear { get; set; }
 
         [Display(Name = "Album artwork URL")]
-        public string ImageUrl { get; set; }
+        public string Cover { get; set; }
     }
 }
