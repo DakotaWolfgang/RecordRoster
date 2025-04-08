@@ -132,9 +132,11 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\Album.cs" />
+    <Compile Include="Models\Song.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <None Include="Views\Album\Details.cshtml" />
     <None Include="Views\Album\Add.cshtml" />
+    <Content Include="Views\Album\Update.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap-grid.css" />
