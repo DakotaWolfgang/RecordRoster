@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace RecordRoster.Models
@@ -19,7 +15,7 @@ namespace RecordRoster.Models
         [Required(ErrorMessage = "Artist is required")]
         public string Artist { get; set; }
 
-        [Required(ErrorMessage = "Year Released is required")]
+        [Required(ErrorMessage = "Release year is required")]
         public int ReleaseYear { get; set; }
 
         [Display(Name = "Album artwork URL")]
