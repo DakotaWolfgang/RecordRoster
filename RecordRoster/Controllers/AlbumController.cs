@@ -50,9 +50,8 @@ namespace RecordRoster.Controllers
         // GET: /Album/Details
         public ActionResult Details(int id)
         {
-            Album album = _context.Albums
-                .Include(a => a.Songs)
-                .FirstOrDefault(a => a.Id == id);
+            Album album = _context.Albums.Find(id);
+            List<Song> trackList = _context.Songs.Where(s => s.AlbumId == id).ToList();
 
             if (album == null)
             {
@@ -60,7 +59,11 @@ namespace RecordRoster.Controllers
                 return RedirectToAction("Library");
             }
 
-            return View(album);
+            return View(new AlbumDetails
+            {
+                Album = album,
+                TrackList = trackList
+            });
         }
 
         // POST: /Album/Add

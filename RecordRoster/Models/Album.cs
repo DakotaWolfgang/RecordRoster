@@ -21,7 +21,5 @@ namespace RecordRoster.Models
 
         [Display(Name = "Album artwork URL")]
         public string Cover { get; set; }
-
-        public virtual ICollection<Song> Songs { get; set; }
     }
 }

@@ -1,29 +1,29 @@
-﻿@model RecordRoster.Models.Album
+﻿@model RecordRoster.Models.AlbumDetails
 
 @{
-    ViewBag.Title = Model.Title;
+    ViewBag.Title = Model.Album.Title;
 }
 
 <p>
     <a href="@Url.Action("Library", "Album")" class="btn btn-primary">&lt;- Back to Library</a>
 </p>
 
-<h2>@Model.Title</h2>
+<h2>@Model.Album.Title</h2>
 
-<img src="@Model.Cover" alt="Album Cover" width="250" height="250" style="border-radius: 5px; margin-bottom: 10px;">
-<p><strong>Title:</strong> @Model.Title </p>
-<p><strong>Artist:</strong> @Model.Artist </p>
-<p><strong>Year:</strong> @Model.ReleaseYear </p>
+<img src="@Model.Album.Cover" alt="Album Cover" width="250" height="250" style="border-radius: 5px; margin-bottom: 10px;">
+<p><strong>Title:</strong> @Model.Album.Title </p>
+<p><strong>Artist:</strong> @Model.Album.Artist </p>
+<p><strong>Year:</strong> @Model.Album.ReleaseYear </p>
 <p><strong>Tracklist:</strong></p>
-@if (Model.Songs != null && Model.Songs.Any())
-{ 
+@if (Model.TrackList != null && Model.TrackList.Any())
+{
     <table class="table">
         <tr>
             <th>Track #</th>
             <th>Title</th>
         </tr>
-        @foreach (var song in Model.Songs.OrderBy(s => s.TrackNumber))
-        { 
+        @foreach (var song in Model.TrackList.OrderBy(s => s.TrackNumber))
+        {
             <tr>
                 <td>@song.TrackNumber</td>
                 <td>@song.Title</td>
@@ -36,7 +36,7 @@ else
     <p>No tracks found for this album.</p>
 }
 <p>
-    <a href="@Url.Action( "Add", "Song", new { albumId = Model.Id})" class="btn btn-secondary">
+    <a href="@Url.Action( "Add", "Song", new { albumId = Model.Album.Id })" class="btn btn-secondary">
         Add New Track
     </a>
 </p>
