@@ -8,7 +8,9 @@
 
 @if (ViewBag.RandomAlbum != null)
 {
-    <img src="@ViewBag.RandomAlbum.Cover" alt="Album Cover" width="250" height="250" style="border-radius: 10px;">
+    <a href="@Url.Action($"Details/{@ViewBag.RandomAlbum.Id}", "Album")">
+        <img src="@ViewBag.RandomAlbum.Cover" width="250" height="250" style="border-radius: 10px; margin: 10px 0;" alt="@ViewBag.RandomAlbum.Title cover">
+    </a>
     <p><strong>Title:</strong> @ViewBag.RandomAlbum.Title </p>
     <p><strong>Artist:</strong> @ViewBag.RandomAlbum.Artist </p>
     <p><strong>Year:</strong> @ViewBag.RandomAlbum.ReleaseYear </p>
