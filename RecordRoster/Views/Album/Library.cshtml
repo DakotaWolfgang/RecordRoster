@@ -38,9 +38,8 @@ else
                         <h5 class="card-title">@album.Title</h5>
                         <p class="card-text">@album.Artist (@album.ReleaseYear)</p>
                         <div class="d-flex justify-content-between mt-3">
-                            @* TODO: Update form page *@
                             <a href="@Url.Action($"Update/{album.Id}", "Album")" class="btn btn-primary btn-sm">Edit</a>
-                            <button class="btn btn-danger btn-sm deleteBtn" data-id="@album.Id">Delete</button>
+                            <a href="@Url.Action($"Delete/{album.Id}", "Album")" class="btn btn-danger btn-sm deleteBtn">Delete</a>
                         </div>
                     </div>
                 </div>
