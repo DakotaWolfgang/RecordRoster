@@ -35,18 +35,9 @@ namespace RecordRoster.Controllers
         }
 
         // GET: /Album/Update form view
-        public ActionResult Update()
+        public ActionResult Update(int id)
         {
-            // Assume ID in route
-            var val = RouteData.Values["id"];
-            if (val == null)
-            {
-                // Broken route, send back to library
-                return RedirectToAction("Library");
-            }
-
-            int albumId = int.Parse(val.ToString());
-            Album album = _context.Albums.Find(albumId);
+            Album album = _context.Albums.Find(id);
             if (album == null)
             {
                 // Album does not exist, send back to library
@@ -57,20 +48,11 @@ namespace RecordRoster.Controllers
         }
 
         // GET: /Album/Details
-        public ActionResult Details()
+        public ActionResult Details(int id)
         {
-            // Assume ID in route
-            var val = RouteData.Values["id"];
-            if (val == null)
-            {
-                // Broken route, send back to library
-                return RedirectToAction("Library");
-            }
-
-            int albumId = int.Parse(val.ToString());
             Album album = _context.Albums
                 .Include(a => a.Songs)
-                .FirstOrDefault(a => a.Id == albumId);
+                .FirstOrDefault(a => a.Id == id);
 
             if (album == null)
             {
