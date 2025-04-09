@@ -15,4 +15,28 @@
 <p><strong>Artist:</strong> @Model.Artist </p>
 <p><strong>Year:</strong> @Model.ReleaseYear </p>
 <p><strong>Tracklist:</strong></p>
-@* TODO: Tracklist on the album detail view here *@
+@if (Model.Songs != null && Model.Songs.Any())
+{ 
+    <table class="table">
+        <tr>
+            <th>Track #</th>
+            <th>Title</th>
+        </tr>
+        @foreach (var song in Model.Songs.OrderBy(s => s.TrackNumber))
+        { 
+            <tr>
+                <td>@song.TrackNumber</td>
+                <td>@song.Title</td>
+            </tr>
+        }
+    </table>
+}
+else
+{
+    <p>No tracks found for this album.</p>
+}
+<p>
+    <a href="@Url.Action( "Add", "Song", new { albumId = Model.Id})" class="btn btn-secondary">
+        Add New Track
+    </a>
+</p>

@@ -1,0 +1,27 @@
+﻿@model RecordRoster.Models.Song
+@{
+    ViewBag.Title = "Update Track";
+}
+
+<h2>Update track</h2>
+
+@if (Model.AlbumId != 0)
+{
+    <a href="@Url.Action( "Details", "Album", new { id = Model.AlbumId })" class="btn btn-primary">
+        &lt;- Back to Album
+    </a>
+
+    <form method="post" action="@Url.Action("Update", "Song")">
+        <input type="hidden" name="AlbumId" value="@Model.AlbumId" />
+        <input type="hidden" name="TrackNumber" value="@Model.TrackNumber" />
+
+        <div class-="form-group">
+            <label for="title">Song Title</label>
+            <input type="text" id="title" name="Title" class="form-control"
+                   value="@Model.Title" />
+        </div>
+        <br />
+
+        <button type="submit" class="btn btn-success">Update Track</button>
+    </form>
+}

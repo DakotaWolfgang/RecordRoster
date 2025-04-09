@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data.Entity;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -67,7 +68,10 @@ namespace RecordRoster.Controllers
             }
 
             int albumId = int.Parse(val.ToString());
-            Album album = _context.Albums.Find(albumId);
+            Album album = _context.Albums
+                .Include(a => a.Songs)
+                .FirstOrDefault(a => a.Id == albumId);
+
             if (album == null)
             {
                 // Album does not exist, send back to library

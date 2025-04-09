@@ -12,5 +12,6 @@ namespace RecordRoster.DataAccessLayer
 		public RecordRosterDb() : base("RecordRosterDb") { }
 
 		public DbSet<Album> Albums { get; set; }
+		public DbSet<Song> Songs { get; set; }
 	}
 }
