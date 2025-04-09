@@ -121,8 +121,7 @@ namespace RecordRoster.Controllers
             return RedirectToAction("Library");
         }
 
-        // POST: /Album/Delete
-        [HttpPost]
+        // GET: /Album/Delete
         public ActionResult Delete(int id)
         {
             var album = _context.Albums.Find(id);
