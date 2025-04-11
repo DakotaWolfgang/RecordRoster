@@ -3,6 +3,15 @@
 @{
     ViewBag.Title = Model.Album.Title;
 }
+@if (TempData["Message"] != null)
+{
+    <p class="text-success">@TempData["Message"]</p>
+}
+@if (TempData["Error"] != null)
+{
+    <p class="text-danger">@TempData["Error"]</p>
+}
+
 
 <p>
     <a href="@Url.Action("Library", "Album")" class="btn btn-primary">&lt;- Back to Library</a>
@@ -21,13 +30,31 @@
         <tr>
             <th>Track #</th>
             <th>Title</th>
+            <th>Actions</th>
         </tr>
         @foreach (var song in Model.TrackList.OrderBy(s => s.TrackNumber))
         {
             <tr>
                 <td>@song.TrackNumber</td>
                 <td>@song.Title</td>
+                <td>
+                    <div class="d-flex gap-2">
+                        @using (Html.BeginForm("Update", "Song", FormMethod.Get))
+                        {
+                            <input type="hidden" name="albumId" value="@song.AlbumId" />
+                            <input type="hidden" name="trackNumber" value="@song.TrackNumber" />
+                            <button type="submit" class="btn btn-sm btn-info">Edit</button>
+                        }
+                        @using (Html.BeginForm("Delete", "Song", FormMethod.Post))
+                        {
+                            <input type="hidden" name="albumId" value="@song.AlbumId" />
+                            <input type="hidden" name="trackNumber" value="@song.TrackNumber" />
+                            <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                        }
+                    </div>
+                </td>
             </tr>
+
         }
     </table>
 }
