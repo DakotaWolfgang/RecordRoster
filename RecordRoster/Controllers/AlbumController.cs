@@ -113,6 +113,14 @@ namespace RecordRoster.Controllers
             if (album != null)
             {
                 _context.Albums.Remove(album);
+
+                // Remove all songs associated with the album
+                var songs = _context.Songs.Where(s => s.AlbumId == id).ToList();
+                foreach (var song in songs)
+                {
+                    _context.Songs.Remove(song);
+                }
+
                 _context.SaveChanges();
 
                 TempData["Message"] = $"Album '{album.Title}' successfully deleted.";
