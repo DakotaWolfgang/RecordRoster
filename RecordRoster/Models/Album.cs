@@ -8,6 +8,8 @@ namespace RecordRoster.Models
 	{
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+
+        public virtual ICollection<Song> Songs { get; set; }
 		public int Id { get; set; }
 
 		[Required(ErrorMessage = "Title is required")]

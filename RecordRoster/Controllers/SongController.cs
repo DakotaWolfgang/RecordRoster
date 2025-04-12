@@ -1,22 +1,21 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using System.Web.Mvc;
 using RecordRoster.DataAccessLayer;
 using RecordRoster.Models;
-using System.Data.Entity;
+using RecordRoster.Repositories;
+
 
 namespace RecordRoster.Controllers
 {
     public class SongController : Controller
     {
         // GET: Song
-        private readonly RecordRosterDb _context = new RecordRosterDb();
+        private readonly ISongRepository _songRepo = new SongRepository();
 
         public ActionResult Library()
         {
-            var songs = _context.Songs.ToList();
+            var songs = _songRepo.GetAllSongs();
             return View(songs);
         }
         
@@ -39,39 +38,34 @@ namespace RecordRoster.Controllers
                     return View(song);
                 }
 
-                // Checking for Duplicates
-                var duplicate = _context.Songs.FirstOrDefault(s =>
-                s.AlbumId == song.AlbumId && s.TrackNumber == song.TrackNumber);
-
-                if (duplicate != null)
+                if (_songRepo.IsDuplicateTrack(song.AlbumId, song.TrackNumber))
                 {
                     TempData["Error"] = $"Track #{song.TrackNumber} already exists for this album.";
                     return RedirectToAction("Details", "Album", new { id = song.AlbumId });
                 }
 
                 // Add new track to DB if there are no duplicates
-                _context.Songs.Add(song);
-                _context.SaveChanges();
-
+                _songRepo.AddSong(song);
                 TempData["Message"] = $"Track '{song.Title}' (#{song.TrackNumber}) added successfully!";
-
-                // Redirect to the album's details page so you can see the updated track list
-                return RedirectToAction("Details", "Album", new { id = song.AlbumId });
             }
             catch (Exception ex)
             {
                 TempData["Error"] = "Error adding track: " + ex.Message;
                 return RedirectToAction("Details", "Album", new { id = song.AlbumId });
             }
+
+            return RedirectToAction("Details", "Album", new { id = song.AlbumId });
         }
 
         public ActionResult Update(int albumId, int trackNumber)
         {
-            var song = _context.Songs.Find(albumId, trackNumber);
+            var song = _songRepo.GetSong(albumId, trackNumber);
             if (song == null)
             {
-                return RedirectToAction("Library", "Album");
+                TempData["Error"] = "Track not found.";
+                return RedirectToAction("Library", "Album", new { id = albumId});
             }
+
             return View(song);
         }
 
@@ -87,26 +81,23 @@ namespace RecordRoster.Controllers
                 }
 
                 // EF can track changes if we retrieve the existing record
-                var existingSong = _context.Songs.Find(updatedSong.AlbumId, updatedSong.TrackNumber);
+                var existingSong = _songRepo.GetSong(updatedSong.AlbumId, updatedSong.TrackNumber);
                 if (existingSong == null)
                 {
-                    return RedirectToAction("Library", "Album");
+                    TempData["Error"] = "Track not found.";
+                    return RedirectToAction("Library", "Album", new { id = updatedSong.AlbumId });
                 }
 
                 // Update only the fields that can change
-                existingSong.Title = updatedSong.Title;
-                _context.SaveChanges();
-
+                _songRepo.UpdateSong(updatedSong);
                 TempData["Message"] = $"Track #{existingSong.TrackNumber} updated successfully!";
-
-                // After updating a song, redirect to album details
-                return RedirectToAction("Details", "Album", new { id = existingSong.AlbumId });
             }
             catch (Exception ex)
             {
                 TempData["Error"] = "Error updating track: " + ex.Message;
-                return RedirectToAction("Detail", "Album", new { id = updatedSong.AlbumId });
             }
+
+            return RedirectToAction("Details", "Album", new { id = updatedSong.AlbumId });
         }
 
         // Delete Song
@@ -115,24 +106,22 @@ namespace RecordRoster.Controllers
         {
             try
             {
-                var song = _context.Songs.Find(albumId, trackNumber);
+                var song = _songRepo.GetSong(albumId, trackNumber);
                 if (song == null)
                 {
                     TempData["Error"] = "Track to delete not found.";
                     return RedirectToAction("Details", "Album", new { id = albumId });
                 }
 
-                _context.Songs.Remove(song);
-                _context.SaveChanges();
-
+                _songRepo.DeleteSong(albumId, trackNumber);
                 TempData["Message"] = $"Track #{trackNumber} deleted successfully!";
-                return RedirectToAction("Details", "Album", new { id = albumId });
             }
             catch (Exception ex)
             {
                 TempData["Error"] = "Error deleting track: " + ex.Message;
-                return RedirectToAction("Detail", "Album", new { id = albumId });
             }
+
+            return RedirectToAction("Details", "Album", new { id = albumId });
         }
     }
 }

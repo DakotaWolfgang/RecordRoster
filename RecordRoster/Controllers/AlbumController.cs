@@ -1,18 +1,17 @@
 ﻿using System;
-using System.Data.Entity;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using System.Web.Mvc;
-using System.Net;
 using RecordRoster.Models;
 using RecordRoster.DataAccessLayer;
+using RecordRoster.Repositories;
 
 namespace RecordRoster.Controllers
 {
     public class AlbumController : Controller
     {
-        private readonly RecordRosterDb _context = new RecordRosterDb();
+        private readonly IAlbumRepository _albumRepo = new AlbumRepository();
+        private readonly ISongRepository _songRepo = new SongRepository();
 
         // GET: /Album/Library view
         public ActionResult Library()
@@ -25,7 +24,7 @@ namespace RecordRoster.Controllers
                 ViewData["Message"] = TempData["Message"];
             }
 
-            return View(_context.Albums.ToList());
+            return View(_albumRepo.GetAllAlbums());
         }
 
         // GET: /Album/Add form view
@@ -37,7 +36,7 @@ namespace RecordRoster.Controllers
         // GET: /Album/Update form view
         public ActionResult Update(int id)
         {
-            Album album = _context.Albums.Find(id);
+            var album = _albumRepo.GetAlbumById(id);
             if (album == null)
             {
                 // Album does not exist, send back to library
@@ -50,8 +49,8 @@ namespace RecordRoster.Controllers
         // GET: /Album/Details
         public ActionResult Details(int id)
         {
-            Album album = _context.Albums.Find(id);
-            List<Song> trackList = _context.Songs.Where(s => s.AlbumId == id).ToList();
+            var album = _albumRepo.GetAlbumById(id);
+            var trackList = _songRepo.GetSongsByAlbum(id);
 
             if (album == null)
             {
@@ -72,8 +71,8 @@ namespace RecordRoster.Controllers
         {
             try
             {
-                _context.Albums.Add(album);
-                _context.SaveChanges();
+                _albumRepo.AddAlbum(album);
+                TempData["Message"] = $"Album '{album.Title}' successfully added.";
             }
             catch
             {
@@ -81,7 +80,7 @@ namespace RecordRoster.Controllers
                 return RedirectToAction("Library");
             }
 
-            TempData["Message"] = $"Album '{album.Title}' successfully added.";
+  
             return RedirectToAction("Library");
         }
 
@@ -89,45 +88,39 @@ namespace RecordRoster.Controllers
         [HttpPost]
         public ActionResult Update(Album album)
         {
-            var existingAlbum = _context.Albums.Find(album.Id);
-            if (existingAlbum != null)
+            var existing = _albumRepo.GetAlbumById(album.Id);
+            if (existing != null)
             {
-                existingAlbum.Title = album.Title;
-                existingAlbum.Artist = album.Artist;
-                existingAlbum.ReleaseYear = album.ReleaseYear;
-                existingAlbum.Cover = album.Cover;
-                _context.SaveChanges();
-
+                _albumRepo.UpdateAlbum(album);
                 TempData["Message"] = $"Album '{album.Title}' successfully updated.";
-                return RedirectToAction("Library");
+            }
+            else
+            {
+                TempData["Error"] = "Album was not found.";
             }
 
-            TempData["Error"] = "Album was not found.";
             return RedirectToAction("Library");
         }
 
         // GET: /Album/Delete
         public ActionResult Delete(int id)
         {
-            var album = _context.Albums.Find(id);
-            if (album != null)
+            var album = _albumRepo.GetAlbumById(id);
+            if (album == null)
             {
-                _context.Albums.Remove(album);
-
-                // Remove all songs associated with the album
-                var songs = _context.Songs.Where(s => s.AlbumId == id).ToList();
-                foreach (var song in songs)
-                {
-                    _context.Songs.Remove(song);
-                }
-
-                _context.SaveChanges();
-
-                TempData["Message"] = $"Album '{album.Title}' successfully deleted.";
+                TempData["Error"] = "Album was not found.";
                 return RedirectToAction("Library");
             }
+                
+            // Remove all songs associated with the album
+            var songs = _songRepo.GetSongsByAlbum(id);
+            foreach (var song in songs)
+            {
+                _songRepo.DeleteSong(song.AlbumId, song.TrackNumber);
+            }
 
-            TempData["Error"] = "Album was not found.";
+            _albumRepo.DeleteAlbum(id);
+            TempData["Message"] = $"Album '{album.Title}' successfully deleted.";
             return RedirectToAction("Library");
         }
 
@@ -135,7 +128,7 @@ namespace RecordRoster.Controllers
         public ActionResult PopulateWithSampleData()
         {
             // If any albums exist in the database, do not populate sample data
-            if (_context.Albums.Any())
+            if (_albumRepo.GetAllAlbums().Any())
             {
                 TempData["Error"] = "Data already exists.";
                 return RedirectToAction("Library");
@@ -151,14 +144,20 @@ namespace RecordRoster.Controllers
             };
 
             // Add sample albums to the database
-            foreach (Album album in sampleAlbums)
+            foreach (var album in sampleAlbums)
             {
-                _context.Albums.Add(album);
+                _albumRepo.AddAlbum(album);
             }
-            _context.SaveChanges();
+            
+
 
             // Get IDs of the added albums since increment/identity may not always be sequential
-            var addedAlbumIds = sampleAlbums.Select(a => a.Id).ToList();
+            var albumsInDb = _albumRepo.GetAllAlbums();
+            var addedAlbumIds = albumsInDb
+                .Where(a => sampleAlbums.Any(s => s.Title == a.Title && s.Artist == a.Artist))
+                .OrderBy(a => a.Title)
+                .Select(a => a.Id)
+                .ToList();
 
             // Create sample songs for each album
             List<Song> sampleSongs = new List<Song>
@@ -206,11 +205,10 @@ namespace RecordRoster.Controllers
             };
 
             // Add sample songs to the database
-            foreach (Song song in sampleSongs)
+            foreach (var song in sampleSongs)
             {
-                _context.Songs.Add(song);
+                _songRepo.AddSong(song);
             }
-            _context.SaveChanges();
 
             TempData["Message"] = "Sample data successfully added.";
 
